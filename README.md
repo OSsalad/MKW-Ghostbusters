@@ -1,4 +1,4 @@
-# MKW Ghostbusters
+# MKW Ghostbusters - Easy Time Trial Ghost Sharing for Dolphin Emulator
 
 <p align="center">
     <img src="assets/tray.png" alt="MKW Ghostbusters icon" width="200">
