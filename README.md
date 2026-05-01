@@ -1,5 +1,9 @@
 # MKW Ghostbusters
 
+<p align="center">
+    <img src="assets/tray.png" alt="MKW Ghostbusters icon" width="200">
+  </p>
+
 LAN ghost-share for Mario Kart Wii on Dolphin. Two friends, same network → one click sends a PB ghost from your `rksys.dat` to your friend's Downloaded slot.
 
 ## What it does
