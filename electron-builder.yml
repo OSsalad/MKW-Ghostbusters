@@ -1,0 +1,20 @@
+appId: com.eschehaddon.mkw-ghostbusters
+productName: MKW Ghostbusters
+directories:
+  output: dist
+files:
+  - "src/**/*"
+  - "assets/tray.png"
+  - "assets/tray.ico"
+  - "package.json"
+  - "node_modules/**/*"
+win:
+  target: nsis
+  icon: assets/tray.ico
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  shortcutName: MKW Ghostbusters
+  include: build/installer.nsh
+  deleteAppDataOnUninstall: false
