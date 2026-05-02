@@ -6,7 +6,8 @@ const { Config, defaultDir } = require('./config');
 const { detectRksysPath } = require('./paths');
 const { createTray } = require('./tray');
 const { buildAppMenu } = require('./app-menu');
-const { getOrCreateWindow, ensureWindowReady, broadcast } = require('./window');
+const { getOrCreateWindow, ensureWindowReady, existingWindow, claimFocus, broadcast } = require('./window');
+const pairToast = require('./pair-toast');
 const { registerIpc } = require('./ipc');
 const { Discovery } = require('./net/discovery');
 const { startServer } = require('./net/server');
@@ -227,6 +228,7 @@ async function setup() {
   };
 
   registerIpc({ pbsApi, offersApi, pairingApi, statusApi });
+  pairToast.registerIpc();
 
   // Settings IPC — exposed via preload as window.api.settings*
   const appVersion = require('../../package.json').version;
@@ -310,11 +312,27 @@ async function setup() {
     onPairInit: pairingFlow.onPairInit,
     onPairConfirm: pairingFlow.onPairConfirm,
     onPairRequest: async (body, ip) => {
-      // Make sure the window is fully loaded BEFORE the pairing flow
-      // broadcasts its 'enter' status — otherwise the renderer hasn't
-      // attached its IPC listeners yet and the prompt is lost.
-      await ensureWindowReady();
-      return pairingFlow.onPairRequest(body, ip);
+      // Check whether the main window is already up BEFORE running the
+      // pairing flow, so we know whether to surface the popup or the
+      // in-window prompt.
+      const w = existingWindow();
+      const mainVisible = w && w.isVisible() && !w.isMinimized();
+
+      const result = await pairingFlow.onPairRequest(body, ip);
+
+      if (mainVisible) {
+        await ensureWindowReady();
+        claimFocus();
+      } else {
+        // Tray-only state — small frameless popup instead of blowing up the
+        // whole window.
+        pairToast.showPairToast({
+          initiator: (body.from || '').slice(0, 8),
+          onSubmit: async (pin) => pairingFlow.enterPin(pin),
+          onCancel: () => {},
+        });
+      }
+      return result;
     },
   });
 

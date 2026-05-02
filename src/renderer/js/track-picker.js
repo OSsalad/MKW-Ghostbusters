@@ -33,7 +33,7 @@ async function renderTrackPicker() {
     }
     return `
       <tr data-track="${p.trackId}" data-slot="${p.slot}" data-expanded="0">
-        <td><input type="checkbox" data-slot="${p.slot}" data-track="${p.trackId}" onclick="event.stopPropagation()"></td>
+        <td><input type="checkbox" data-slot="${p.slot}" data-track="${p.trackId}" data-nopropagate></td>
         <td>${p.trackName}${badge}</td>
         <td>${p.timeStr}</td>
       </tr>`;
@@ -44,6 +44,7 @@ async function renderTrackPicker() {
   </table>`;
   root.querySelectorAll('input[type=checkbox]').forEach(cb => {
     cb.addEventListener('change', updateSendButton);
+    cb.addEventListener('click', (e) => e.stopPropagation());
   });
   // Click anywhere on the row except the checkbox to expand the detail card.
   root.querySelectorAll('tbody tr[data-track]').forEach(tr => {

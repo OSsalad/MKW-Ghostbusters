@@ -15,6 +15,9 @@ files:
 win:
   target: nsis
   icon: assets/tray.ico
+  # Match latest.yml (it uses dashes); avoids the GitHub-rename mismatch
+  # where uploaded files with spaces become dots and break the updater.
+  artifactName: "MKW-Ghostbusters-Setup-${version}.${ext}"
 nsis:
   oneClick: false
   perMachine: false

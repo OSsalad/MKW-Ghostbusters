@@ -238,6 +238,12 @@ code {
 .banner.warn { background: #3a2c1f; border: 1px solid #6a4f33; color: #ffd49a; }
 .banner.info { background: var(--surface); border: 1px solid var(--border); color: var(--fg); }
 
+/* Send button states */
+#btn-send { transition: background 200ms ease, color 200ms ease; min-width: 140px; }
+#btn-send.is-sending { background: #8e44ad; color: white; }
+#btn-send.is-success  { background: #f1c40f; color: #1c1c1e; }
+#btn-send.is-error    { background: #ff453a; color: white; }
+
 /* Detail card */
 .ghost-detail {
   padding: var(--gap-4);

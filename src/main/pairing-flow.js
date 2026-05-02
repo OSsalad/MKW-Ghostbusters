@@ -59,6 +59,7 @@ function makePairingFlow({ getOwnUuid, getPeer, setPeer, isPeerKnown, savePeer, 
         }
         savePeer(session.peerUuid, key);
         broadcast('pair:status', { stage: 'paired', peerUuid: session.peerUuid });
+        try { require('./pair-toast').closePairToast(); } catch (_) {}
         session = null;
         return { ok: true };
       } catch (err) {
@@ -116,7 +117,9 @@ function makePairingFlow({ getOwnUuid, getPeer, setPeer, isPeerKnown, savePeer, 
     // entering a PIN. Allowed only from a peer we already see (mDNS/manual).
     onPairRequest: async ({ from, addr }, _ip) => {
       if (!from) throw new Error('missing from');
-      if (isPeerKnown && !isPeerKnown(from, addr)) throw new Error('unknown initiator');
+      // Deliberately not gating on isPeerKnown here — the PIN exchange is
+      // the actual security boundary, and the previous gate was too brittle
+      // (asymmetric mDNS visibility would lock pairing out entirely).
       if (addr && setPeer) {
         const m = addr.match(/^([^:]+):(\d+)$/);
         if (m) {

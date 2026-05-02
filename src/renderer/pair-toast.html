@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+  <link rel="stylesheet" href="style/style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--fg);
+      -webkit-app-region: drag;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+    h3 { margin: 0 0 4px 0; font-size: 14px; }
+    p { margin: 0 0 12px 0; color: var(--muted); font-size: 12px; }
+    #pin {
+      width: 100%;
+      padding: 10px;
+      font-size: 22px;
+      text-align: center;
+      letter-spacing: 6px;
+      -webkit-app-region: no-drag;
+      font-variant-numeric: tabular-nums;
+    }
+    .actions { margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end; }
+    button { -webkit-app-region: no-drag; }
+    #status { margin-top: 8px; font-size: 12px; color: var(--muted); min-height: 14px; }
+  </style>
+</head>
+<body>
+  <h3>Pair request 👻</h3>
+  <p id="who">A friend wants to pair with you.</p>
+  <input id="pin" maxlength="6" inputmode="numeric" placeholder="------" autocomplete="off" autofocus>
+  <div id="status"></div>
+  <div class="actions">
+    <button id="cancel" class="secondary">Cancel</button>
+    <button id="submit">Confirm</button>
+  </div>
+  <script src="js/pair-toast.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 {
   "name": "mkw-ghost-share",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "MKW Ghostbusters — LAN ghost transfer for Mario Kart Wii Dolphin",
   "main": "src/main/index.js",
   "scripts": {

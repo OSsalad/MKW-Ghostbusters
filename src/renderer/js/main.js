@@ -102,17 +102,43 @@ async function init() {
   document.getElementById('btn-settings').addEventListener('click', () => renderSettings());
 
   document.getElementById('btn-send').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-send');
     const slots = Array.from(document.querySelectorAll('#track-picker input:checked'))
       .map(cb => ({ slot: Number(cb.dataset.slot), trackId: Number(cb.dataset.track) }));
     const target = document.getElementById('send-target').value;
     const targetUuid = target === '__primary__' ? null : target;
+
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.classList.remove('is-success', 'is-error');
+    btn.classList.add('is-sending');
+    btn.textContent = 'Sending ghost...';
     setOfferStatus(`Sending ${slots.length} ghost${slots.length > 1 ? 's' : ''}...`);
+
     const r = await window.api.sendPbsTo(slots, targetUuid);
+    btn.classList.remove('is-sending');
+
+    let success = false;
     if (target === '__all__') {
+      success = !!r.ok;
       setOfferStatus(r.summary || (r.ok ? 'Sent to everyone.' : 'No friends accepted.'));
-    } else if (r.ok) setOfferStatus('Friend imported the ghost(s).');
-    else if (r.status === 403) setOfferStatus('Friend rejected the offer.');
-    else setOfferStatus(`Send failed: ${r.reason || r.status}`);
+    } else if (r.ok) {
+      success = true;
+      setOfferStatus('Friend imported the ghost(s).');
+    } else if (r.status === 403) {
+      setOfferStatus('Friend rejected the offer.');
+    } else {
+      setOfferStatus(`Send failed: ${r.reason || r.status}`);
+    }
+
+    btn.classList.add(success ? 'is-success' : 'is-error');
+    btn.textContent = success ? 'Sent!' : 'Failed';
+    setTimeout(() => {
+      btn.classList.remove('is-success', 'is-error');
+      btn.textContent = originalText;
+      btn.disabled = false;
+      updateSendButton();
+    }, 1500);
   });
 
   // Populate send-target dropdown from paired peers.

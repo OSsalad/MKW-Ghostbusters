@@ -20,7 +20,7 @@ async function renderReceivedList() {
         <td>${g.timeStr}</td>
         <td>${g.senderName}</td>
         <td style="color:var(--muted); font-size:var(--fs-xs);">${date}</td>
-        <td><button data-slot="${g.slot}" class="del-ghost secondary" onclick="event.stopPropagation()">Delete</button></td>
+        <td><button data-slot="${g.slot}" class="del-ghost secondary">Delete</button></td>
       </tr>`;
   }).join('');
   root.innerHTML = `
@@ -30,7 +30,9 @@ async function renderReceivedList() {
       <tbody>${rows}</tbody>
     </table>`;
   root.querySelectorAll('.del-ghost').forEach(btn => {
-    btn.onclick = async () => {
+    btn.addEventListener('click', (e) => e.stopPropagation());
+    btn.onclick = async (e) => {
+      e.stopPropagation();
       const slot = Number(btn.dataset.slot);
       if (!confirm('Delete this ghost?')) return;
       btn.disabled = true;
