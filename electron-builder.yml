@@ -2,6 +2,10 @@ appId: com.eschehaddon.mkw-ghostbusters
 productName: MKW Ghostbusters
 directories:
   output: dist
+publish:
+  provider: github
+  owner: OSsalad
+  repo: MKW-Ghostbusters
 files:
   - "src/**/*"
   - "assets/tray.png"

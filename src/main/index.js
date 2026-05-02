@@ -20,7 +20,7 @@ const { DeferredImports } = require('./deferred-imports');
 const { listDownloads } = require('../shared/rksys');
 const { RksysWatcher } = require('./file-watcher');
 const { makeAutoShare } = require('./auto-share');
-const { checkForUpdate } = require('./update-check');
+const { autoUpdater } = require('electron-updater');
 
 let tray = null;
 let cfg = null;
@@ -248,7 +248,6 @@ async function setup() {
       peerConnected: !!peerState.current,
       peerVia: peerState.current ? peerState.current.via : null,
       autoShareEnabled: !!d.autoShareEnabled,
-      updateManifestUrl: d.updateManifestUrl || null,
       updateState,
     };
   });
@@ -450,29 +449,73 @@ async function setup() {
     return { ok: true, enabled: !!enabled };
   });
 
-  ipcMain.handle('settings:setUpdateUrl', (_e, url) => {
-    const d = cfg.load();
-    d.updateManifestUrl = url ? String(url).trim() : null;
-    cfg.save(d);
-    return { ok: true };
+  // electron-updater: pulls release info from the GitHub repo configured in
+  // electron-builder.yml (publish: github). When a new release exists, it
+  // downloads the .exe in the background and quitAndInstall replaces it.
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.on('checking-for-update', () => {
+    updateState = { ...updateState, status: 'checking' };
+    broadcast('update:status', updateState);
+  });
+  autoUpdater.on('update-available', (info) => {
+    updateState = {
+      ...updateState,
+      status: 'available',
+      hasUpdate: true,
+      remoteVersion: info.version,
+      currentVersion: appVersion,
+      notes: info.releaseNotes || null,
+      lastChecked: new Date().toISOString(),
+    };
+    broadcast('update:status', updateState);
+  });
+  autoUpdater.on('update-not-available', (info) => {
+    updateState = {
+      ...updateState,
+      status: 'up-to-date',
+      hasUpdate: false,
+      remoteVersion: info && info.version,
+      currentVersion: appVersion,
+      lastChecked: new Date().toISOString(),
+    };
+    broadcast('update:status', updateState);
+  });
+  autoUpdater.on('download-progress', (p) => {
+    updateState = {
+      ...updateState,
+      status: 'downloading',
+      progress: { percent: p.percent, transferred: p.transferred, total: p.total, bytesPerSecond: p.bytesPerSecond },
+    };
+    broadcast('update:status', updateState);
+  });
+  autoUpdater.on('update-downloaded', (info) => {
+    updateState = {
+      ...updateState,
+      status: 'ready',
+      hasUpdate: true,
+      remoteVersion: info.version,
+      readyToInstall: true,
+    };
+    broadcast('update:status', updateState);
+  });
+  autoUpdater.on('error', (err) => {
+    updateState = { ...updateState, status: 'error', error: err && err.message };
+    broadcast('update:status', updateState);
   });
 
   ipcMain.handle('update:check', async () => {
-    const url = cfg.load().updateManifestUrl;
-    if (!url) return { ok: false, reason: 'no manifest url configured' };
-    const r = await checkForUpdate({ manifestUrl: url, currentVersion: appVersion });
-    if (r.ok) {
-      updateState = { ...r, lastChecked: new Date().toISOString() };
-      broadcast('update:status', updateState);
-    }
-    return r;
+    try { await autoUpdater.checkForUpdates(); return { ok: true }; }
+    catch (err) { return { ok: false, reason: err.message }; }
   });
-
-  ipcMain.handle('update:open', () => {
-    if (updateState.downloadUrl) shell.openExternal(updateState.downloadUrl);
-    return { ok: !!updateState.downloadUrl };
+  ipcMain.handle('update:download', async () => {
+    try { await autoUpdater.downloadUpdate(); return { ok: true }; }
+    catch (err) { return { ok: false, reason: err.message }; }
   });
-
+  ipcMain.handle('update:install', () => {
+    autoUpdater.quitAndInstall(true, true);
+    return { ok: true };
+  });
   ipcMain.handle('update:status', () => updateState);
 
   // Multi-friend: explicit send to one peer (or all paired) by uuid.
@@ -517,13 +560,8 @@ async function setup() {
 
   // Background update check on launch + every 6h.
   const tryUpdateCheck = async () => {
-    const url = cfg.load().updateManifestUrl;
-    if (!url) return;
-    const r = await checkForUpdate({ manifestUrl: url, currentVersion: appVersion });
-    if (r.ok) {
-      updateState = { ...r, lastChecked: new Date().toISOString() };
-      broadcast('update:status', updateState);
-    }
+    try { await autoUpdater.checkForUpdates(); }
+    catch (err) { console.warn('[updater]', err && err.message); }
   };
   setTimeout(tryUpdateCheck, 5_000);
   setInterval(tryUpdateCheck, 6 * 60 * 60_000);

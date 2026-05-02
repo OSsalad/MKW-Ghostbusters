@@ -1,3 +1,19 @@
+function updateStatusLine(s) {
+  if (!s) return '<span style="color:var(--muted);">No check yet</span>';
+  if (s.status === 'checking') return '<span style="color:var(--muted);">Checking...</span>';
+  if (s.status === 'downloading') {
+    const pct = s.progress ? Math.floor(s.progress.percent) : 0;
+    return `<span style="color:#ffd400;">Downloading update ${s.remoteVersion}: ${pct}%</span>`;
+  }
+  if (s.status === 'ready') {
+    return `<span style="color:#34c759;">Update ${s.remoteVersion} downloaded — restart to install.</span>`;
+  }
+  if (s.hasUpdate) return `<span style="color:#ffd400;">Update ${s.remoteVersion} available (you have ${s.currentVersion}).</span>`;
+  if (s.status === 'error') return `<span style="color:#ff453a;">Update error: ${s.error || 'unknown'}</span>`;
+  if (s.lastChecked) return `<span style="color:var(--muted);">Up to date (checked ${new Date(s.lastChecked).toLocaleString()})</span>`;
+  return '<span style="color:var(--muted);">No check yet</span>';
+}
+
 async function renderSettings() {
   hideAllViews();
   const root = document.getElementById('settings-view');
@@ -81,21 +97,12 @@ async function renderSettings() {
     </div>
 
     <div class="settings-row">
-      <label>Update manifest URL</label>
+      <label>Updates</label>
       <div class="settings-value">
-        <input id="set-update-url" type="text" placeholder="https://example.com/mkw-ghostbusters.json"
-               value="${s.updateManifestUrl || ''}" style="width:100%; padding:6px;">
-        <small style="color:var(--muted);">JSON manifest with <code>version</code>, <code>downloadUrl</code>, <code>notes</code>. Checked every 6h on launch.</small>
-        <div style="margin-top:6px; font-size:12px;">
-          ${s.updateState && s.updateState.hasUpdate
-            ? `<span style="color:#ffd400;">⬆ ${s.updateState.remoteVersion} available</span>`
-            : s.updateState && s.updateState.lastChecked
-            ? `<span style="color:var(--muted);">Up to date (last checked ${new Date(s.updateState.lastChecked).toLocaleString()})</span>`
-            : '<span style="color:var(--muted);">No check yet</span>'}
-        </div>
+        <div style="font-size:13px;">${updateStatusLine(s.updateState)}</div>
+        <small style="color:var(--muted);">Updates are pulled from the GitHub repo automatically. Checked every 6h on launch.</small>
       </div>
       <div style="display:flex; gap:8px;">
-        <button id="set-update-save">Save</button>
         <button id="set-update-check" class="secondary">Check now</button>
       </div>
     </div>
@@ -141,15 +148,9 @@ async function renderSettings() {
   document.getElementById('set-autoshare').onchange = async (e) => {
     await window.api.settings.setAutoShare(e.target.checked);
   };
-  document.getElementById('set-update-save').onclick = async () => {
-    const v = document.getElementById('set-update-url').value.trim();
-    await window.api.settings.setUpdateUrl(v || null);
-    renderSettings();
-  };
   document.getElementById('set-update-check').onclick = async () => {
     const r = await window.api.update.check();
     if (!r.ok) alert(`Couldn't check: ${r.reason}`);
-    renderSettings();
   };
   document.getElementById('set-back').onclick = () => {
     showMainView();

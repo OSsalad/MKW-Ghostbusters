@@ -1,5 +1,5 @@
 {
-  "version": "0.6.1",
-  "downloadUrl": "https://github.com/OSsalad/MKW-Ghostbusters/releases/download/v0.6.1/MKW.Ghostbusters.Setup.0.6.1.exe",
-  "notes": "Fixed an 'unknown id' bug when accepting timed-out offers. Custom dark scrollbar."
+  "version": "0.7.0",
+  "downloadUrl": "https://github.com/OSsalad/MKW-Ghostbusters/releases/download/v0.7.0/MKW.Ghostbusters.Setup.0.7.0.exe",
+  "notes": "In-app auto-update via electron-updater. Future updates download in-app and apply on restart with a single click — no manual installer."
 }

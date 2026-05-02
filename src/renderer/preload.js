@@ -36,11 +36,11 @@ contextBridge.exposeInMainWorld('api', {
     setManualPeer: (addr) => ipcRenderer.invoke('settings:setManualPeer', addr),
     setNickname: (uuid, nickname) => ipcRenderer.invoke('settings:setNickname', uuid, nickname),
     setAutoShare: (enabled) => ipcRenderer.invoke('settings:setAutoShare', enabled),
-    setUpdateUrl: (url) => ipcRenderer.invoke('settings:setUpdateUrl', url),
   },
   update: {
     check: () => ipcRenderer.invoke('update:check'),
-    open: () => ipcRenderer.invoke('update:open'),
+    download: () => ipcRenderer.invoke('update:download'),
+    install: () => ipcRenderer.invoke('update:install'),
     status: () => ipcRenderer.invoke('update:status'),
     onStatus: (cb) => ipcRenderer.on('update:status', (_e, d) => cb(d)),
     onAutoShareFiring: (cb) => ipcRenderer.on('auto-share:firing', (_e, d) => cb(d)),

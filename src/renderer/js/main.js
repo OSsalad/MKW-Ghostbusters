@@ -135,15 +135,42 @@ async function init() {
   refreshSendTarget();
   window.api.onPeersChanged(() => refreshSendTarget());
 
-  // Update banner.
+  // Update banner: morphs through available → downloading → ready states.
   function applyUpdateState(s) {
     const banner = document.getElementById('update-banner');
+    const textEl = document.getElementById('update-banner-text');
+    const dlBtn = document.getElementById('update-download');
+    const dismissBtn = document.getElementById('update-dismiss');
     if (!s || !s.hasUpdate) { banner.hidden = true; return; }
     banner.hidden = false;
-    document.getElementById('update-banner-text').textContent =
-      `New version ${s.remoteVersion} available (you're on ${s.currentVersion})${s.notes ? ': ' + s.notes : ''}`;
+    if (s.status === 'downloading') {
+      const pct = s.progress ? Math.floor(s.progress.percent) : 0;
+      const mb = s.progress ? (s.progress.transferred / 1024 / 1024).toFixed(1) : '0';
+      const total = s.progress ? (s.progress.total / 1024 / 1024).toFixed(1) : '?';
+      textEl.textContent = `Downloading ${s.remoteVersion}: ${pct}% (${mb} / ${total} MB)`;
+      dlBtn.disabled = true;
+      dlBtn.textContent = 'Downloading...';
+      dismissBtn.style.display = 'none';
+    } else if (s.status === 'ready') {
+      textEl.textContent = `Update ${s.remoteVersion} downloaded. Restart to install.`;
+      dlBtn.disabled = false;
+      dlBtn.textContent = 'Restart and install';
+      dismissBtn.style.display = '';
+    } else {
+      textEl.textContent = `New version ${s.remoteVersion} available (you're on ${s.currentVersion}).`;
+      dlBtn.disabled = false;
+      dlBtn.textContent = 'Download update';
+      dismissBtn.style.display = '';
+    }
   }
-  document.getElementById('update-download').onclick = () => window.api.update.open();
+  document.getElementById('update-download').onclick = async () => {
+    const s = await window.api.update.status();
+    if (s && s.status === 'ready') {
+      await window.api.update.install();
+    } else {
+      await window.api.update.download();
+    }
+  };
   document.getElementById('update-dismiss').onclick = () => { document.getElementById('update-banner').hidden = true; };
   window.api.update.status().then(applyUpdateState);
   window.api.update.onStatus(applyUpdateState);
