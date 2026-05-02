@@ -1,0 +1,5 @@
+{
+  "version": "0.6.1",
+  "downloadUrl": "https://github.com/OSsalad/MKW-Ghostbusters/releases/download/v0.6.1/MKW%20Ghostbusters%20Setup%200.6.1.exe",
+  "notes": "Fixed an 'unknown id' bug when accepting timed-out offers. Custom dark scrollbar."
+}
