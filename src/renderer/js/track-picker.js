@@ -22,9 +22,10 @@ async function renderTrackPicker() {
     let badge = '';
     if (cmp && cmp.friends && cmp.friends.length) {
       const best = cmp.friends.reduce((a, b) => a.timeMs < b.timeMs ? a : b);
-      const delta = best.timeMs - p.timeMs;
-      const color = delta > 0 ? '#34c759' : delta < 0 ? '#ff453a' : '#888';
-      const sign = delta > 0 ? '+' : delta < 0 ? '−' : '±';
+      // Racing convention: negative = you ahead, positive = you behind.
+      const delta = p.timeMs - best.timeMs;
+      const color = delta < 0 ? 'var(--ok)' : delta > 0 ? 'var(--bad)' : 'var(--muted)';
+      const sign = delta < 0 ? '−' : delta > 0 ? '+' : '±';
       const abs = Math.abs(delta);
       badge = `<span style="margin-left:8px; padding:2px 6px; background:var(--border); border-radius:3px; font-size:11px; color:${color};">
         vs ${best.senderName} ${sign}${(abs / 1000).toFixed(3)}s

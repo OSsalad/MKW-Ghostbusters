@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('api', {
   startPairing: (mode) => ipcRenderer.invoke('pair:start', mode),
   enterPin: (pin) => ipcRenderer.invoke('pair:enterPin', pin),
   initiatePair: (target) => ipcRenderer.invoke('pair:initiate', target),
+  probePeer: (target) => ipcRenderer.invoke('peer:probe', target),
   currentPair: () => ipcRenderer.invoke('pair:current'),
   listDiscoveredPeers: () => ipcRenderer.invoke('discovery:list'),
   onDiscoveryPeers: (cb) => ipcRenderer.on('discovery:peers', (_e, d) => cb(d)),

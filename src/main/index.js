@@ -363,6 +363,21 @@ async function setup() {
   });
 
   ipcMain.handle('pair:initiate', (_e, target) => pairingFlow.startAsInitiator(target));
+
+  ipcMain.handle('peer:probe', async (_e, target) => {
+    if (!target || !target.host || !target.port) return { ok: false, reason: 'no target' };
+    return new Promise((resolve) => {
+      const req = require('http').get({
+        host: target.host, port: target.port, path: '/health', timeout: 3000,
+      }, (res) => {
+        let body = '';
+        res.on('data', (c) => { body += c; });
+        res.on('end', () => resolve({ ok: res.statusCode === 200 && body.trim() === 'ok', status: res.statusCode, body: body.trim() }));
+      });
+      req.on('error', (err) => resolve({ ok: false, reason: err.message }));
+      req.on('timeout', () => { req.destroy(); resolve({ ok: false, reason: 'timeout' }); });
+    });
+  });
   ipcMain.handle('pair:current', () => pairingFlow.current());
 
   ipcMain.handle('settings:setNickname', (_e, uuid, nickname) => {

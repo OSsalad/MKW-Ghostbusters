@@ -22,7 +22,7 @@ function lapDeltaBars(myLaps, friendLaps) {
   }
   const rows = deltas.map((d, i) => {
     const pct = (Math.abs(d) / maxAbs) * 100;
-    const color = d < 0 ? '#34c759' : d > 0 ? '#ff453a' : '#888';
+    const color = d < 0 ? 'var(--ok)' : d > 0 ? 'var(--bad)' : 'var(--muted)';
     const side = d < 0 ? 'right: 50%;' : 'left: 50%;';
     return `
       <div style="display:flex; align-items:center; gap:8px; margin:3px 0;">
@@ -36,7 +36,9 @@ function lapDeltaBars(myLaps, friendLaps) {
   }).join('');
   return `
     <div style="margin-top:8px; padding:8px; background:var(--bg); border-radius:4px;">
-      <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">Per-lap delta (you vs friend; green = you faster)</div>
+      <div style="font-size:11px; color:var(--muted); margin-bottom:4px;">
+        Per-lap split times — your lap minus theirs. Negative (green) = you faster on that lap.
+      </div>
       ${rows}
     </div>`;
 }
@@ -49,9 +51,10 @@ function ghostDetailHtml(g, comparison) {
   if (comparison && comparison.friends && comparison.friends.length) {
     const myLaps = comparison.myTime && comparison.myTime.lapTimes;
     const friendBlocks = comparison.friends.map(f => {
-      const delta = comparison.myTime ? f.timeMs - comparison.myTime.timeMs : null;
+      // From your perspective: negative = you ahead, positive = you behind.
+      const delta = comparison.myTime ? comparison.myTime.timeMs - f.timeMs : null;
       const deltaHtml = delta !== null
-        ? `<span style="color:${delta > 0 ? '#34c759' : delta < 0 ? '#ff453a' : '#888'};"> (${fmtDelta(delta)} vs you)</span>`
+        ? `<span style="color:${delta < 0 ? 'var(--ok)' : delta > 0 ? 'var(--bad)' : 'var(--muted)'};"> (you ${fmtDelta(delta)})</span>`
         : '';
       return `
         <div style="margin-top:6px;">
