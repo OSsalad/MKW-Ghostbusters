@@ -7,8 +7,8 @@ async function renderReceivedList() {
   _receivedCache = items;
   if (!items || items.length === 0) {
     root.innerHTML = `
-      <h3 style="margin:24px 0 8px 0; color:var(--muted); text-transform:uppercase; font-size:11px;">Received ghosts (0/32)</h3>
-      <p style="color:var(--muted); font-size:13px;">Nothing yet. Ghosts your friends send you will appear here.</p>`;
+      <h3 class="section-title">Received ghosts (0/32)</h3>
+      <p style="color:var(--muted);">Nothing yet. Ghosts your friends send you will appear here.</p>`;
     return;
   }
   items.sort((a, b) => (b.receivedAt || '').localeCompare(a.receivedAt || ''));
@@ -19,14 +19,12 @@ async function renderReceivedList() {
         <td>${g.trackName}</td>
         <td>${g.timeStr}</td>
         <td>${g.senderName}</td>
-        <td style="color:var(--muted); font-size:11px;">${date}</td>
+        <td style="color:var(--muted); font-size:var(--fs-xs);">${date}</td>
         <td><button data-slot="${g.slot}" class="del-ghost secondary" onclick="event.stopPropagation()">Delete</button></td>
       </tr>`;
   }).join('');
   root.innerHTML = `
-    <h3 style="margin:24px 0 8px 0; color:var(--muted); text-transform:uppercase; font-size:11px;">
-      Received ghosts (${items.length}/32)
-    </h3>
+    <h3 class="section-title">Received ghosts (${items.length}/32)</h3>
     <table>
       <thead><tr><th>Track</th><th>Time</th><th>From</th><th>Received</th><th></th></tr></thead>
       <tbody>${rows}</tbody>

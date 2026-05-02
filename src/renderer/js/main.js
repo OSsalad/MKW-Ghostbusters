@@ -62,8 +62,8 @@ function renderDeferred(list) {
   if (!list || list.length === 0) { root.innerHTML = ''; return; }
   const total = list.reduce((acc, x) => acc + x.ghostCount, 0);
   root.innerHTML = `
-    <div style="padding:10px 12px; background:#3a2c1f; border:1px solid #6a4f33; border-radius:6px; color:#ffd49a; font-size:13px;">
-      ⏳ ${total} ghost${total > 1 ? 's' : ''} queued — will import automatically the moment you close Dolphin.
+    <div class="banner warn">
+      <span>⏳ ${total} ghost${total > 1 ? 's' : ''} queued — will import automatically the moment you close Dolphin.</span>
     </div>`;
 }
 

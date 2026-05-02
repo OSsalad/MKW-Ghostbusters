@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0",
-  "downloadUrl": "https://github.com/OSsalad/MKW-Ghostbusters/releases/download/v0.7.0/MKW.Ghostbusters.Setup.0.7.0.exe",
-  "notes": "In-app auto-update via electron-updater. Future updates download in-app and apply on restart with a single click — no manual installer."
+  "version": "0.7.1",
+  "downloadUrl": "https://github.com/OSsalad/MKW-Ghostbusters/releases/download/v0.7.1/MKW.Ghostbusters.Setup.0.7.1.exe",
+  "notes": "UI refinement: consistent spacing rhythm, unified section headers, removed redundant 'Already paired' text. Plus all the in-app auto-update niceties from 0.7.0."
 }
