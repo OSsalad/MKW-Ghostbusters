@@ -1,14 +1,24 @@
-<p align="center">
-    <img src="assets/tray.png" alt="MKW Ghostbusters icon" width="200">
-  </p>
+<div align="center">
 
-  # MKW Ghostbusters - Time Trial Ghost Sharing for Dolphin Emulator
+  <img src="assets/tray.png" alt="MKW Ghostbusters icon" width="200">
 
-LAN ghost-share for Mario Kart Wii on Dolphin. Two friends, same network → one click sends a PB ghost from your `rksys.dat` to your friend's Downloaded slot.
+  # MKW Ghostbusters - Easy Time Trial Ghost Sharing
+
+
+  </div>
+
+
+
+LAN ghost-share for Mario Kart Wii on Dolphin. Two (or more) friends, same network → one click sends a PB ghost from your `rksys.dat` to your friend's Downloaded slot.
+
+Manually finding your save file, extracting time trials & importing them on another save file is a thing of the past! 
+
+Massive shout-out to TT-Rec for building the ghost manager script! (https://github.com/AtishaRibeiro/TT-Rec-Tools)
 
 ## What it does
 
 - Discovers a friend on your LAN automatically (mDNS), with manual IP fallback for picky firewalls
+- (Considering plans for online transfer, but for the moment this was developed for my housemate and I to easily transfer ghosts) 
 - PIN-paired, HMAC-signed ghost transfers — only people you've paired with can send you anything
 - Inline track comparison: see your PB vs your friend's PB on every track, with per-lap delta charts
 - Auto-share new PBs the moment Dolphin saves them (toggle in Settings)
